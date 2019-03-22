@@ -14,7 +14,13 @@ import RealmSwift
 // MARK: - CacheManager
 open class CacheManager {
     
-    public static let shared:CacheManager = CacheManager(cachable: RealmCacheable(realm:Realm.sharedRealm))
+    public static var shared:CacheManager{
+        return CacheManager(cachable: RealmCacheable(realm:Realm.sharedRealm))
+    }
+    
+    public static var user:CacheManager {
+        return CacheManager(cachable: RealmCacheable(realm:Realm.userRealm))
+    }
     
     private let cachable: Cacheable
     

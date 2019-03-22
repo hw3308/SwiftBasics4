@@ -28,5 +28,4 @@ public enum MIMEType: String {
         }
         return .unknown
     }
-    
 }

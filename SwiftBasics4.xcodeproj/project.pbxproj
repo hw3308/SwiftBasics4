@@ -9,6 +9,10 @@
 /* Begin PBXBuildFile section */
 		CD0ED4B722447795001A7E63 /* NoDataView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD0ED4B622447795001A7E63 /* NoDataView.swift */; };
 		CD0ED4BA22448ADD001A7E63 /* LoadingIndicator.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD0ED4B922448ADD001A7E63 /* LoadingIndicator.swift */; };
+		CD0ED4BF2244AF17001A7E63 /* ApiRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD0ED4BC2244AF17001A7E63 /* ApiRequest.swift */; };
+		CD0ED4C02244AF17001A7E63 /* ApiError.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD0ED4BD2244AF17001A7E63 /* ApiError.swift */; };
+		CD0ED4C12244AF17001A7E63 /* ApiResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD0ED4BE2244AF17001A7E63 /* ApiResponse.swift */; };
+		CD0ED4C32244B0F7001A7E63 /* ApiSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD0ED4C22244B0F7001A7E63 /* ApiSettings.swift */; };
 		CD1645F42227B4CB00AF80F8 /* Toast.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD1645F32227B4CB00AF80F8 /* Toast.swift */; };
 		CD1645F62227B4FD00AF80F8 /* Queue.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD1645F52227B4FD00AF80F8 /* Queue.swift */; };
 		CD60BC5B2243646200256B01 /* SwiftURLCache.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD60BC542243646200256B01 /* SwiftURLCache.swift */; };
@@ -75,6 +79,10 @@
 		58FB2E1ECAB2DAA78DC6CD20 /* Pods-Swift4Basics.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Swift4Basics.release.xcconfig"; path = "Pods/Target Support Files/Pods-Swift4Basics/Pods-Swift4Basics.release.xcconfig"; sourceTree = "<group>"; };
 		CD0ED4B622447795001A7E63 /* NoDataView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoDataView.swift; sourceTree = "<group>"; };
 		CD0ED4B922448ADD001A7E63 /* LoadingIndicator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LoadingIndicator.swift; sourceTree = "<group>"; };
+		CD0ED4BC2244AF17001A7E63 /* ApiRequest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ApiRequest.swift; sourceTree = "<group>"; };
+		CD0ED4BD2244AF17001A7E63 /* ApiError.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ApiError.swift; sourceTree = "<group>"; };
+		CD0ED4BE2244AF17001A7E63 /* ApiResponse.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ApiResponse.swift; sourceTree = "<group>"; };
+		CD0ED4C22244B0F7001A7E63 /* ApiSettings.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ApiSettings.swift; sourceTree = "<group>"; };
 		CD1645F32227B4CB00AF80F8 /* Toast.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Toast.swift; sourceTree = "<group>"; };
 		CD1645F52227B4FD00AF80F8 /* Queue.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Queue.swift; sourceTree = "<group>"; };
 		CD60BC542243646200256B01 /* SwiftURLCache.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SwiftURLCache.swift; sourceTree = "<group>"; };
@@ -171,6 +179,18 @@
 				CD0ED4B922448ADD001A7E63 /* LoadingIndicator.swift */,
 			);
 			path = Loading;
+			sourceTree = "<group>";
+		};
+		CD0ED4BB2244AEDB001A7E63 /* Request */ = {
+			isa = PBXGroup;
+			children = (
+				CD0ED4C22244B0F7001A7E63 /* ApiSettings.swift */,
+				CD0ED4BD2244AF17001A7E63 /* ApiError.swift */,
+				CD0ED4BC2244AF17001A7E63 /* ApiRequest.swift */,
+				CD0ED4BE2244AF17001A7E63 /* ApiResponse.swift */,
+				CDE8D60B20859274007D9C22 /* MIMEType.swift */,
+			);
+			path = Request;
 			sourceTree = "<group>";
 		};
 		CD60BC532243646200256B01 /* URLCache */ = {
@@ -413,8 +433,8 @@
 		CDE8D60920859274007D9C22 /* NetWork */ = {
 			isa = PBXGroup;
 			children = (
+				CD0ED4BB2244AEDB001A7E63 /* Request */,
 				CDE8D60A20859274007D9C22 /* NetworkManager.swift */,
-				CDE8D60B20859274007D9C22 /* MIMEType.swift */,
 			);
 			path = NetWork;
 			sourceTree = "<group>";
@@ -555,6 +575,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				CD60BCB7224393AC00256B01 /* LoadingButton.swift in Sources */,
+				CD0ED4C12244AF17001A7E63 /* ApiResponse.swift in Sources */,
 				CD60BC8622436EFD00256B01 /* DateFormatter+Format.swift in Sources */,
 				CD60BC8922436EFD00256B01 /* UIColor+RGB.swift in Sources */,
 				CDE8D63220859274007D9C22 /* MIMEType.swift in Sources */,
@@ -599,15 +620,18 @@
 				CD60BC9B22437DA800256B01 /* UIViewController+Show.swift in Sources */,
 				CDE8D63520859274007D9C22 /* Notifications.swift in Sources */,
 				CD60BC8822436EFD00256B01 /* Realm+Cache.swift in Sources */,
+				CD0ED4C32244B0F7001A7E63 /* ApiSettings.swift in Sources */,
 				CDBEE93F222786FF0098CA00 /* Alert.swift in Sources */,
 				CD60BC9522437C5300256B01 /* String+Digit.swift in Sources */,
 				CD60BC8722436EFD00256B01 /* UIViewController+Top.swift in Sources */,
 				CD60BC9D22437E2000256B01 /* UIViewController+NavigationBar.swift in Sources */,
 				CD60BC5C2243646200256B01 /* Cacheable.swift in Sources */,
+				CD0ED4C02244AF17001A7E63 /* ApiError.swift in Sources */,
 				CD60BCA92243836F00256B01 /* HorizontalButton.swift in Sources */,
 				CDE8D63320859274007D9C22 /* Log.swift in Sources */,
 				CDE8D63720859274007D9C22 /* App.swift in Sources */,
 				CD60BC8422436EFD00256B01 /* String+Extension.swift in Sources */,
+				CD0ED4BF2244AF17001A7E63 /* ApiRequest.swift in Sources */,
 				CD60BC642243659600256B01 /* LocalStorage.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

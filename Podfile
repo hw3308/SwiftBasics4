@@ -20,8 +20,6 @@ target:SwiftBasics4 do
 
   pod 'ReachabilitySwift'
 
-  pod 'Kingfisher'
-
   pod 'MJRefresh'
   
 end

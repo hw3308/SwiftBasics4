@@ -18,12 +18,12 @@ open class CacheObject: Object {
     
     @objc dynamic var expires: Double = 0.0
 
+    var isValid: Bool {
+        return self.expires > Date.timeIntervalSinceReferenceDate
+    }
+    
     // 主键
     override open class func primaryKey() -> String? {
         return "key"
-    }
-    
-    var isValid: Bool {
-        return self.expires > Date.timeIntervalSinceReferenceDate
     }
 }

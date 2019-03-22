@@ -41,6 +41,7 @@ open class RealmCacheable: Cacheable {
         let obj = CacheObject()
         obj.key = key
         obj.value = string
+        obj.expires = Date().timeIntervalSinceReferenceDate
         setObject(obj)
     }
     

@@ -8,43 +8,36 @@
 
 import Foundation
 import Alamofire
-import Kingfisher
 
 open class NetworkManager {
     
-    public static var defaultManager: Alamofire.SessionManager!
+    public static var defaultManager: SessionManager!
     
     public static let sharedCookieStorage = HTTPCookieStorage.shared
     
-    public static func initNetworkManager(sserverTrustPolicie serverTrustPolicies: [String: ServerTrustPolicy]? = nil) {
+    public static var defaultSessionConfiguration:URLSessionConfiguration = URLSessionConfiguration.default
+    
+
+    //MARK: 初始化网络请求 默认JSON
+    public static func initNetworkManager(serverTrustPolicie serverTrustPolicies: [String: ServerTrustPolicy]? = nil) {
         
         SwiftURLCache.activate()
         
+        ///安全策略
         var serverTrustPolicyManager: ServerTrustPolicyManager? = nil
         if let policies = serverTrustPolicies {
             serverTrustPolicyManager = ServerTrustPolicyManager(policies: policies)
         }
         
-        // 初始化图片下载器
-        let configuration = NetworkManager.defaultSessionConfiguration
-        configuration.requestCachePolicy = .returnCacheDataElseLoad
-//        let manager = Alamofire.SessionManager(configuration: configuration, serverTrustPolicyManager: serverTrustPolicyManager)
-         //设置图片缓存
-        let downloader = KingfisherManager.shared.downloader
-        downloader.downloadTimeout = 5.0
+        defaultSessionConfiguration.timeoutIntervalForRequest = 10
+        defaultSessionConfiguration.httpAdditionalHeaders = Alamofire.SessionManager.defaultHTTPHeaders
+        defaultSessionConfiguration.httpCookieStorage = sharedCookieStorage
+        ///地址
+        defaultSessionConfiguration.urlCache = URLCache.shared
+        ///缓存策略
+        defaultSessionConfiguration.requestCachePolicy = .returnCacheDataElseLoad
         
-        let cache = KingfisherManager.shared.cache
-        cache.maxDiskCacheSize = 100 * 1024 * 1024
-        cache.maxCachePeriodInSecond = 60 * 60 * 24 * 7
-        cache.cleanExpiredDiskCache()
-        
-        downloader.sessionConfiguration = configuration
-        
-        // 初始化默认网络请求
-        NetworkManager.defaultManager = Alamofire.SessionManager(
-            configuration: NetworkManager.defaultSessionConfiguration,
-            serverTrustPolicyManager: serverTrustPolicyManager
-        )
+        defaultManager = Alamofire.SessionManager(configuration: NetworkManager.defaultSessionConfiguration, serverTrustPolicyManager: serverTrustPolicyManager)
     }
     
     static func removeAllCookies() {
@@ -53,23 +46,5 @@ open class NetworkManager {
                 sharedCookieStorage.deleteCookie(cookie)
             }
         }
-    }
-}
-
-// MARK: - Default Session Configuration
-
-extension NetworkManager {
-    public static var defaultSessionConfiguration: URLSessionConfiguration {
-        var headers = Alamofire.SessionManager.defaultHTTPHeaders
-        headers["Cache-Control"] = "private"
-        headers["User-Agent"] = WebView.userAgent
-        
-        let configuration = URLSessionConfiguration.default
-        configuration.timeoutIntervalForRequest = 20 // 网络超时时间
-        configuration.httpAdditionalHeaders = headers
-        configuration.httpCookieStorage = sharedCookieStorage
-        configuration.urlCache = Foundation.URLCache.shared
-        
-        return configuration
     }
 }
