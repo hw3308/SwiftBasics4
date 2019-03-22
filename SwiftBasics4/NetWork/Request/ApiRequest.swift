@@ -70,6 +70,19 @@ import AlamofireObjectMapper
         return self
     }
     
+    fileprivate func codingURLRequest(_ url: URL, method: HTTPMethod ,params: Parameters?,  timeout:TimeInterval = 10) -> URLRequest?{
+        
+        let cachePolicy:NSURLRequest.CachePolicy = NetworkReachabilityManager()!.isReachable ?.reloadIgnoringCacheData:.returnCacheDataDontLoad
+        
+        var urlRequest = URLRequest.init(url: url, cachePolicy: cachePolicy, timeoutInterval: timeout)
+        urlRequest.httpMethod = method.rawValue
+        
+        let encodingMode: ParameterEncoding = (method != .get) ? JSONEncoding.default:URLEncoding.default
+        
+        let re = try? encodingMode.encode(urlRequest , with: params)
+        
+        return re
+    }
     
     /// 调用API请求
     fileprivate func call<T>(_ method: HTTPMethod, _ callback: @escaping (_ response: ApiResponse<T>) -> Void) -> ApiRequest {
@@ -78,15 +91,8 @@ import AlamofireObjectMapper
             return self
         }
     
-        let cachePolicy:NSURLRequest.CachePolicy = NetworkReachabilityManager()!.isReachable ?.reloadIgnoringCacheData:.returnCacheDataDontLoad
-        
-        var urlRequest = URLRequest.init(url: url, cachePolicy: cachePolicy, timeoutInterval: 10.0)
-        urlRequest.httpMethod = method.rawValue
-        
-        let encodingMode: ParameterEncoding = (method != .get) ? JSONEncoding.default:URLEncoding.default
-
-        let re = try? encodingMode.encode(urlRequest , with: self.params)
-        
+        let re = codingURLRequest(url, method: method, params: self.params)
+    
         self.request = NetworkManager.defaultManager?.request(re!)
         
         #if DEBUG
@@ -149,102 +155,6 @@ import AlamofireObjectMapper
             }
         }
     }
-    
-    /// 上传图片 JSON
-    public func uploadImage<T>(_ image : UIImage, params: [String : Any]?,_ callback: @escaping (_ response: ApiResponse<T>) -> Void) -> ApiRequest {
-        
-        guard let url = URL(string: buidUrlString()) else {
-            return self
-        }
-        
-        guard let data = image.data else { return self }
-        
-        let cachePolicy:NSURLRequest.CachePolicy = NetworkReachabilityManager()!.isReachable ?.reloadIgnoringCacheData:.returnCacheDataDontLoad
-        var urlRequest = URLRequest.init(url: url, cachePolicy: cachePolicy, timeoutInterval: 20.0)
-        urlRequest.httpMethod = HTTPMethod.post.rawValue
-        urlRequest.timeoutInterval = 20.0
-        
-        let encodingMode: ParameterEncoding = JSONEncoding.default
-
-        let re = try? encodingMode.encode(urlRequest , with: self.params)
-        
-        self.request = NetworkManager.defaultManager.upload(data, with: re!)
-
-        self.startLoading()
-        
-        let dataType = self.options["dataType"] as! MIMEType
-        switch dataType {
-        case .json:
-            request?.responseObject(queue: DispatchQueue.global(),  completionHandler: { (response:DataResponse<ApiResponse<T>>) in
-                self.handleJSON(response, callback: callback)
-            })
-        default:
-            self.stopLoading()
-        }
-        
-        return self
-    }
-    
-    /// 上传文件 JSON
-
-    public func uploadFile<T>(_ file:String, params: [String : Any]?,_ callback: @escaping (_ response: ApiResponse<T>) -> Void) -> ApiRequest{
-        guard let url = URL(string: buidUrlString()) else {
-            return self
-        }
-        
-        let fileUrl = URL(fileURLWithPath: file)
-        
-        let cachePolicy:NSURLRequest.CachePolicy = NetworkReachabilityManager()!.isReachable ?.reloadIgnoringCacheData:.returnCacheDataDontLoad
-        var urlRequest = URLRequest.init(url: url, cachePolicy: cachePolicy, timeoutInterval: 20.0)
-        urlRequest.httpMethod = HTTPMethod.post.rawValue
-        urlRequest.timeoutInterval = 20.0
-        
-        let encodingMode: ParameterEncoding = JSONEncoding.default
-        
-        let re = try? encodingMode.encode(urlRequest , with: self.params)
-        
-        self.request = NetworkManager.defaultManager.upload(fileUrl, with: re!)
-        
-        self.startLoading()
-        
-        let dataType = self.options["dataType"] as! MIMEType
-        switch dataType {
-        case .json:
-            request?.responseObject(queue: DispatchQueue.global(),  completionHandler: { (response:DataResponse<ApiResponse<T>>) in
-                self.handleJSON(response, callback: callback)
-            })
-        default:
-            self.stopLoading()
-        }
-        
-        return self
-    }
-    
-    //上传文件 Form表单
-    public func uploadFile<T>(_ file : String, fileName:String,_ callback: @escaping (_ response: ApiResponse<T>) -> Void) -> ApiRequest{
-        
-        guard let url = URL(string: buidUrlString()) else {
-            return self
-        }
-        let fileUrl = URL(fileURLWithPath: file)
-        
-        self.startLoading()
-        NetworkManager.defaultManager.upload(multipartFormData: { (multipartFormData:MultipartFormData) in
-             multipartFormData.append(fileUrl, withName: fileName)
-        }, to: url) { (result:SessionManager.MultipartFormDataEncodingResult) in
-    
-            self.stopLoading()
-            switch result {
-            case .success(let upload, _, _):
-                upload.responseObject(queue: DispatchQueue.global(), completionHandler: { (response:DataResponse<ApiResponse<T>>) in
-                    self.handleJSON(response, callback: callback)
-                })
-            case .failure(_):
-                break
-            }
-        }
-        return self
-    }
 
     /// 取消API请求
     func cancel() {
@@ -254,28 +164,6 @@ import AlamofireObjectMapper
     // 生成URL字符串
     func buidUrlString() -> String {
         return "\(settings.baseURL())/\(action)"
-    }
-}
-
-// MARK: - 载入动画
-
-extension ApiRequest {
-    
-    fileprivate func startLoading() {
-        
-        if let quiet = self.options["quiet"] as? Bool, quiet {
-            return
-        }
-        
-        LoadingIndicator.shared.startLoading()
-    }
-    
-    fileprivate func stopLoading() {
-        
-        if let quiet = self.options["quiet"] as? Bool, quiet {
-            return
-        }
-        LoadingIndicator.shared.stopLoading()
     }
 }
 
@@ -335,4 +223,117 @@ extension ApiRequest {
         Log.info(r.debugDescription)
     }
 
+}
+//MARK: 文件上传
+extension ApiRequest{
+    
+    /// 上传图片 JSON
+    public func uploadImage<T>(_ image : UIImage, params: Parameters?,_ callback: @escaping (_ response: ApiResponse<T>) -> Void){
+        
+        guard let url = URL(string: buidUrlString()) else {
+            return
+        }
+        
+        guard let data = image.data else { return }
+        
+        let re = self.codingURLRequest(url, method: HTTPMethod.post, params: params, timeout: 20.0)
+        
+        self.startLoading()
+        self.request = NetworkManager.defaultManager.upload(data, with: re!)
+        
+        let dataType = self.options["dataType"] as! MIMEType
+        switch dataType {
+        case .json:
+            request?.responseObject(queue: DispatchQueue.global(),  completionHandler: { (response:DataResponse<ApiResponse<T>>) in
+                self.handleJSON(response, callback: callback)
+            })
+        default:
+            self.stopLoading()
+        }
+        
+        return
+    }
+    
+    /// 上传文件 JSON
+    
+    public func uploadFile<T>(filePath file:String, params: Parameters?,_ callback: @escaping (_ response: ApiResponse<T>) -> Void){
+        
+        guard let url = URL(string: buidUrlString()) else {
+            return
+        }
+        
+        let fileUrl = URL(fileURLWithPath: file)
+        
+        let re = self.codingURLRequest(url, method: HTTPMethod.post, params: params, timeout: 20.0)
+        
+        self.startLoading()
+        self.request = NetworkManager.defaultManager.upload(fileUrl, with: re!)
+        
+        let dataType = self.options["dataType"] as! MIMEType
+        switch dataType {
+        case .json:
+            request?.responseObject(queue: DispatchQueue.global(),  completionHandler: { (response:DataResponse<ApiResponse<T>>) in
+                self.handleJSON(response, callback: callback)
+            })
+        default:
+            self.stopLoading()
+        }
+        
+        return
+    }
+    
+    //上传文件 Form表单
+    public func uploadFile<T>(filePath file : String, fileName:String, params: Parameters?, _ callback: @escaping (_ response: ApiResponse<T>) -> Void){
+        
+        guard let url = URL(string: buidUrlString()) else {
+            return
+        }
+        let fileUrl = URL(fileURLWithPath: file)
+        
+        let re = self.codingURLRequest(url, method: HTTPMethod.post, params: params, timeout: 20.0)
+        
+        self.startLoading()
+        NetworkManager.defaultManager.upload(multipartFormData: { (multipartFormData:MultipartFormData) in
+            multipartFormData.append(fileUrl, withName: fileName)
+        }, with: re!) { (result:SessionManager.MultipartFormDataEncodingResult) in
+            self.stopLoading()
+            switch result {
+            case .success(let upload, _, _):
+                upload.responseObject(queue: DispatchQueue.global(), completionHandler: { (response:DataResponse<ApiResponse<T>>) in
+                    self.handleJSON(response, callback: callback)
+                })
+            case .failure(_):
+                let value = ApiResponse<T>()
+                value.isOK = false
+                value.error = ApiError.dataError
+                Queue.async {
+                    callback(value)
+                }
+                break
+            }
+        }
+    }
+}
+
+
+// MARK: - 载入动画
+
+extension ApiRequest {
+    
+    fileprivate func startLoading() {
+        
+        if let quiet = self.options["quiet"] as? Bool, quiet {
+            return
+        }
+        
+        LoadingIndicator.shared.startLoading()
+    }
+    
+    fileprivate func stopLoading() {
+        
+        if let quiet = self.options["quiet"] as? Bool, quiet {
+            return
+        }
+        LoadingIndicator.shared.stopLoading()
+    }
 }
