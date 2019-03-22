@@ -34,10 +34,10 @@ extension WebView {
         open func process(_ methodName: String, options: JSON) {
             let selector = Selector("call_\(methodName):")
             if self.responds(to: selector) {
-                Log.info("embed service: \(options.jsonString)")
+
                 self.performSelector(inBackground: selector, with: options.object)
             } else {
-                Log.error("unknown embed service: \(options.jsonString)")
+
             }
         }
         
@@ -53,11 +53,11 @@ extension WebView {
             if let webView = userContentController!.webView.webView {
                 let callbackFunction = success ? options["success"]: options["fail"]
                 if let funcname = callbackFunction as? String {
-                    Log.info("embed service: \(success ? "success" : "fail") \(funcname)(\(methodName))")
+
                     webView.evaluateJavaScript("\(funcname)(\(result))", completionHandler: nil)
                 }
                 if let complete = options["complete"] as? String {
-                    Log.info("embed service: complete \(complete)(\(methodName))")
+
                     webView.evaluateJavaScript("\(complete)(\(result))", completionHandler: nil)
                 }
             }
@@ -70,7 +70,7 @@ extension WebView {
             webView.serviceDelegate?.webView(webView, didCancelService: methodName, withOptions: options)
             
             if let webView = webView.webView, let funcname = options["cancel"] as? String {
-                Log.info("embed service: cancel")
+
                 webView.evaluateJavaScript("\(funcname)()", completionHandler: nil)
             }
         }

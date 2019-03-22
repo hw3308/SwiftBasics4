@@ -12,10 +12,11 @@ import Reachability
 
 open class SwiftURLCache: URLCache {
     
+    ///缓存目录名称
     public static var cacheFolder = "URLCache"
-    
+    ///内存大小
     public static var memoryCapacity:Int = 16 * 1024 * 1024
-    
+    ///硬盘大小
     public static var diskCapacity:Int = 256 * 1024 * 1024
     
     public static var filter: (_ request: URLRequest) -> Bool = { _ in return true }
@@ -34,7 +35,7 @@ open class SwiftURLCache: URLCache {
         URLCache.shared = urlCache
     }
     
-    // Will be called by a NSURLConnection when it's wants to know if there is something in the cache.
+    //缓存请求 如果对应的URLRequest没有cached的response那么返回nil
     open override func cachedResponse(for request: URLRequest) -> CachedURLResponse? {
         guard let url = request.url else {
             Log.error("CACHE not allowed for nil URLs")
@@ -73,7 +74,7 @@ open class SwiftURLCache: URLCache {
         return nil
     }
     
-    // Will be called by NSURLConnection when a request is complete.
+    //存储缓存  为特定的URLRequest做cache
     open override func storeCachedResponse(_ cachedResponse: CachedURLResponse, for request: URLRequest) {
         if !SwiftURLCache.filter(request) {
             return
@@ -90,7 +91,7 @@ open class SwiftURLCache: URLCache {
         }
         let storageDirectory = NSString(string: storagePath).deletingLastPathComponent
         do {
-            //Log.info("Creating cache directory \(storageDirectory)");
+
             try FileManager.default.createDirectory(atPath: storageDirectory, withIntermediateDirectories: true, attributes: nil)
         } catch let error as NSError {
             Log.error("Error creating cache directory \(storageDirectory)");
@@ -106,7 +107,6 @@ open class SwiftURLCache: URLCache {
         
         if let previousResponse = NSKeyedUnarchiver.unarchiveObject(withFile: storagePath) as? CachedURLResponse {
             if previousResponse.data == cachedResponse.data {
-                //Log.info("CACHE not rewriting stored file for \(request.URL!.absoluteString)");
                 return
             }
         }

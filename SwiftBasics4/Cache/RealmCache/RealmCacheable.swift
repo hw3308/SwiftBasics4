@@ -49,7 +49,6 @@ open class RealmCacheable: Cacheable {
         guard let obj = object(forKey: key) else { return }
         try! realm.write {
             realm.delete(obj)
-            Log.info("RealmDB: remove cache \"\(key)\"")
         }
     }
     
@@ -60,9 +59,8 @@ open class RealmCacheable: Cacheable {
                     realm.delete(realm.objects(CacheObject.self))
                 }
             }
-            Log.info("RealmDB: clear")
         } catch let error as NSError  {
-            Log.error("RealmDB: clear. \(error)")
+            Log.error(error.localizedDescription)
         }
     }
 }

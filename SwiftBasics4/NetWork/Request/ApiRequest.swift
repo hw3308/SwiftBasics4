@@ -78,17 +78,16 @@ import AlamofireObjectMapper
             return self
         }
     
-        let urlRequest = NSMutableURLRequest(url: url)
+        let cachePolicy:NSURLRequest.CachePolicy = NetworkReachabilityManager()!.isReachable ?.reloadIgnoringCacheData:.returnCacheDataDontLoad
+        
+        var urlRequest = URLRequest.init(url: url, cachePolicy: cachePolicy, timeoutInterval: 10.0)
         urlRequest.httpMethod = method.rawValue
-        urlRequest.cachePolicy = NetworkReachabilityManager()!.isReachable ?.reloadIgnoringCacheData:.returnCacheDataDontLoad
         
-        let encoding: ParameterEncoding = (method != .get) ? JSONEncoding.default:URLEncoding.default
+        let encodingMode: ParameterEncoding = (method != .get) ? JSONEncoding.default:URLEncoding.default
 
-        let encoded = try? encoding.encode(urlRequest as! URLRequestConvertible , with: self.params)
+        let re = try? encodingMode.encode(urlRequest , with: self.params)
         
-        let manager = NetworkManager.defaultManager
-        
-        request = manager?.request(encoded!)
+        self.request = NetworkManager.defaultManager?.request(re!)
         
         #if DEBUG
             Log.info(self.request?.debugDescription)
@@ -103,7 +102,6 @@ import AlamofireObjectMapper
                 self.handleJSON(response, callback: callback)
             })
         default:
-            Log.error("api: unsupported data type (\(dataType))")
             self.stopLoading()
             
         }
@@ -113,12 +111,12 @@ import AlamofireObjectMapper
     //请求结果处理
     fileprivate func handleJSON<T>(_ response:DataResponse<ApiResponse<T>>, callback: @escaping (_ response: ApiResponse<T>) -> Void){
         
+        self.stopLoading()
+        
         switch response.result{
         case .success(let value):
-            
+    
             value.rawData = response.data!
-            
-
             if value.isOK {
                 if let _ = self.options["cacheKey"] as? String {
                     
@@ -126,6 +124,9 @@ import AlamofireObjectMapper
                 Log.info(value.rawString)
             } else {
                 Log.error(value.errorMsg)
+            }
+            Queue.async {
+                callback(value)
             }
             
         case .failure(_):
@@ -149,15 +150,100 @@ import AlamofireObjectMapper
         }
     }
     
+    /// 上传图片 JSON
+    public func uploadImage<T>(_ image : UIImage, params: [String : Any]?,_ callback: @escaping (_ response: ApiResponse<T>) -> Void) -> ApiRequest {
+        
+        guard let url = URL(string: buidUrlString()) else {
+            return self
+        }
+        
+        guard let data = image.data else { return self }
+        
+        let cachePolicy:NSURLRequest.CachePolicy = NetworkReachabilityManager()!.isReachable ?.reloadIgnoringCacheData:.returnCacheDataDontLoad
+        var urlRequest = URLRequest.init(url: url, cachePolicy: cachePolicy, timeoutInterval: 20.0)
+        urlRequest.httpMethod = HTTPMethod.post.rawValue
+        urlRequest.timeoutInterval = 20.0
+        
+        let encodingMode: ParameterEncoding = JSONEncoding.default
 
-    public func uploadImage<T>(_ images : [String], fileName : String, params: [String : Any]?,_ callback: @escaping (_ response: ApiResponse<T>) -> Void){
+        let re = try? encodingMode.encode(urlRequest , with: self.params)
         
-        let timestamp = Int(Date().timeIntervalSince1970)
-        let fieldName = "\(timestamp).jpeg"
-        self.uploadImage(images,fileName:fileName,fieldName:fieldName,params:params,callback)
+        self.request = NetworkManager.defaultManager.upload(data, with: re!)
+
+        self.startLoading()
+        
+        let dataType = self.options["dataType"] as! MIMEType
+        switch dataType {
+        case .json:
+            request?.responseObject(queue: DispatchQueue.global(),  completionHandler: { (response:DataResponse<ApiResponse<T>>) in
+                self.handleJSON(response, callback: callback)
+            })
+        default:
+            self.stopLoading()
+        }
+        
+        return self
     }
-    public func uploadImage<T>(_ images : [String], fileName : String, fieldName:String,params: [String : Any]!,_ callback: @escaping (_ response: ApiResponse<T>) -> Void){
+    
+    /// 上传文件 JSON
+
+    public func uploadFile<T>(_ file:String, params: [String : Any]?,_ callback: @escaping (_ response: ApiResponse<T>) -> Void) -> ApiRequest{
+        guard let url = URL(string: buidUrlString()) else {
+            return self
+        }
         
+        let fileUrl = URL(fileURLWithPath: file)
+        
+        let cachePolicy:NSURLRequest.CachePolicy = NetworkReachabilityManager()!.isReachable ?.reloadIgnoringCacheData:.returnCacheDataDontLoad
+        var urlRequest = URLRequest.init(url: url, cachePolicy: cachePolicy, timeoutInterval: 20.0)
+        urlRequest.httpMethod = HTTPMethod.post.rawValue
+        urlRequest.timeoutInterval = 20.0
+        
+        let encodingMode: ParameterEncoding = JSONEncoding.default
+        
+        let re = try? encodingMode.encode(urlRequest , with: self.params)
+        
+        self.request = NetworkManager.defaultManager.upload(fileUrl, with: re!)
+        
+        self.startLoading()
+        
+        let dataType = self.options["dataType"] as! MIMEType
+        switch dataType {
+        case .json:
+            request?.responseObject(queue: DispatchQueue.global(),  completionHandler: { (response:DataResponse<ApiResponse<T>>) in
+                self.handleJSON(response, callback: callback)
+            })
+        default:
+            self.stopLoading()
+        }
+        
+        return self
+    }
+    
+    //上传文件 Form表单
+    public func uploadFile<T>(_ file : String, fileName:String,_ callback: @escaping (_ response: ApiResponse<T>) -> Void) -> ApiRequest{
+        
+        guard let url = URL(string: buidUrlString()) else {
+            return self
+        }
+        let fileUrl = URL(fileURLWithPath: file)
+        
+        self.startLoading()
+        NetworkManager.defaultManager.upload(multipartFormData: { (multipartFormData:MultipartFormData) in
+             multipartFormData.append(fileUrl, withName: fileName)
+        }, to: url) { (result:SessionManager.MultipartFormDataEncodingResult) in
+    
+            self.stopLoading()
+            switch result {
+            case .success(let upload, _, _):
+                upload.responseObject(queue: DispatchQueue.global(), completionHandler: { (response:DataResponse<ApiResponse<T>>) in
+                    self.handleJSON(response, callback: callback)
+                })
+            case .failure(_):
+                break
+            }
+        }
+        return self
     }
 
     /// 取消API请求
@@ -229,18 +315,21 @@ extension ApiRequest {
             return
         }
 
-        let urlRequest = NSMutableURLRequest(url: url)
-        urlRequest.httpMethod = "POST"
-        urlRequest.cachePolicy = NetworkReachabilityManager()!.isReachable ?.reloadIgnoringCacheData:.returnCacheDataDontLoad
+        let cachePolicy:NSURLRequest.CachePolicy = NetworkReachabilityManager()!.isReachable ?.reloadIgnoringCacheData:.returnCacheDataDontLoad
+        
+        var urlRequest = URLRequest.init(url: url, cachePolicy: cachePolicy, timeoutInterval: 10.0)
+        urlRequest.httpMethod = HTTPMethod.post.rawValue
         urlRequest.httpBody = jsonString.data
         
         let encoding: ParameterEncoding = URLEncoding.default
         
-        let encoded = try? encoding.encode(urlRequest as! URLRequestConvertible , with: self.params)
+        let re = try? encoding.encode(urlRequest, with: self.params)
     
-        request = NetworkManager.defaultManager.request(encoded!)
+        self.request = NetworkManager.defaultManager.request(re!)
         
+        startLoading()
         let r = request?.responseObject { (response: DataResponse<ApiResponse<T>>) in
+            self.stopLoading()
             self.handleJSON(response, callback: callback)
         }
         Log.info(r.debugDescription)
