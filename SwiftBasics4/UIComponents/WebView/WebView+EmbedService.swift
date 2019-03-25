@@ -34,7 +34,6 @@ extension WebView {
         open func process(_ methodName: String, options: JSON) {
             let selector = Selector("call_\(methodName):")
             if self.responds(to: selector) {
-
                 self.performSelector(inBackground: selector, with: options.object)
             } else {
 

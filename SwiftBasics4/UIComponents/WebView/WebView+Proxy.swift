@@ -43,6 +43,17 @@ extension WebView {
         return webView.load(request)
     }
     
+    public func loadURLString(_ urlString: String) -> WKNavigation? {
+        if let url = URL(string: urlString) {
+            return loadRequest(URLRequest(url: url))
+        }
+        return nil
+    }
+    
+    public func loadUrl(_ url: URL) -> WKNavigation? {
+        return loadRequest(URLRequest(url: url))
+    }
+    
     public func loadHTMLString(_ string: String, baseURL: Foundation.URL?) -> WKNavigation? {
         return webView.loadHTMLString(string, baseURL: baseURL)
     }

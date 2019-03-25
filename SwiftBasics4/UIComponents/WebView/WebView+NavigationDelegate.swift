@@ -11,6 +11,7 @@ import WebKit
 
 extension WebView: WKNavigationDelegate {
     
+    ///请求之前，决定是否要跳转:用户点击网页上的链接，需要打开新页面时，将先调用这个方法。
     public func webView(_ webView: WKWebView, decidePolicyFor navigationAction: WKNavigationAction, decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {
         guard let url = navigationAction.request.url else {
             decisionHandler(.cancel)
@@ -18,57 +19,64 @@ extension WebView: WKNavigationDelegate {
         }
         let urlString = url.absoluteString
         if urlString.contains("//itunes.apple.com/") || !urlString.hasPrefix("//") && !urlString.hasPrefix("http:") && !urlString.hasPrefix("https:") {
-            UIApplication.shared.openURL(url)
+            if #available(iOS 10.0, *) {
+                UIApplication.shared.open(url, options: [UIApplication.OpenExternalURLOptionsKey : Any](), completionHandler: nil)
+            } else {
+                UIApplication.shared.openURL(url)
+            }
             decisionHandler(.cancel)
-        } else if navigationDelegate != nil//&& navigationDelegate!.responds(to: #selector(WKNavigationDelegate.webView(_:decidePolicyFor:decisionHandler:)))
-        {
-            navigationDelegate!.webView?(webView, decidePolicyFor: navigationAction, decisionHandler: decisionHandler)
-        } else {
-            decisionHandler(.allow)
+            return
         }
-    }//#1
-    
+        
+        if let _ = navigationDelegate ,navigationDelegate!.responds(to: Selector(("webView:decidePolicyFor:decisionHandler:"))){
+            navigationDelegate?.webView?(webView, decidePolicyFor: navigationAction, decisionHandler: decisionHandler)
+            return
+        }
+        
+        decisionHandler(.allow)
+    }
+    ///接收到相应数据后，决定是否跳转
     public func webView(_ webView: WKWebView, decidePolicyFor navigationResponse: WKNavigationResponse, decisionHandler: @escaping (WKNavigationResponsePolicy) -> Void) {
-        if navigationDelegate != nil //&& navigationDelegate!.responds(to: #selector(WKNavigationDelegate.webView(_:decidePolicyFor:decisionHandler:)))
-        {
-            navigationDelegate!.webView?(webView, decidePolicyFor: navigationResponse, decisionHandler: decisionHandler)
-        } else {
-            decisionHandler(.allow)
+        
+        if let _  = navigationDelegate{
+            navigationDelegate?.webView?(webView, decidePolicyFor: navigationResponse, decisionHandler: decisionHandler)
+            return
         }
-    }//#2
+            
+        decisionHandler(.allow)
+    }
     
+    ///页面开始加载时调用
     public func webView(_ webView: WKWebView, didStartProvisionalNavigation navigation: WKNavigation!) {
-        Log.info("webview: \(webView.url!.absoluteString)")
-        if !loadingProgressBarHidden {
-            loadingProgressBar.isHidden = false
-            loadingProgressBar.progress = 0.1
-        }
+        loadingProgressBarHidden = false
         navigationDelegate?.webView?(webView, didStartProvisionalNavigation: navigation)
-    }//#3
+    }
     
+    /// 主机地址被重定向时调用
     public func webView(_ webView: WKWebView, didReceiveServerRedirectForProvisionalNavigation navigation: WKNavigation!) {
         navigationDelegate?.webView?(webView, didReceiveServerRedirectForProvisionalNavigation: navigation)
-    }//#4
-    
+    }
+    /// 页面加载失败时调用
     public func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error: Error) {
-        Log.error("webview didFailProvisionalNavigation:\(error)")
+        loadingProgressBarHidden = true
         navigationDelegate?.webView?(webView, didFailProvisionalNavigation: navigation, withError: error)
-    }//#5
-    
+    }
+    /// 当内容开始返回时调用
     public func webView(_ webView: WKWebView, didCommit navigation: WKNavigation!) {
         navigationDelegate?.webView?(webView, didCommit: navigation)
-    }//6
-    
+    }
+    /// 页面加载完毕时调用
     public func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
-        loadingProgressBar.isHidden = true
-        loadingProgressBar.progress = 1
+        loadingProgressBarHidden = true
         navigationDelegate?.webView?(webView, didFinish: navigation!)
-    }//7
+    }
     
+    ///跳转失败时调用
     public func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
         navigationDelegate?.webView?(webView, didFail: navigation, withError: error)
-    }//8
+    }
     
+    /// 如果需要证书验证，与使用AFN进行HTTPS证书验证是一样的
     public func webView(_ webView: WKWebView, didReceive challenge: URLAuthenticationChallenge, completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {
         if navigationDelegate != nil && navigationDelegate!.responds(to: #selector(WKNavigationDelegate.webView(_:didReceive:completionHandler:))) {
             navigationDelegate!.webView?(webView, didReceive: challenge, completionHandler: completionHandler)
@@ -110,22 +118,10 @@ extension WebView: WKNavigationDelegate {
                 completionHandler(.cancelAuthenticationChallenge, nil)
             }
         }
-    }//9
-    
+    }
+    ///9.0才能使用，web内容处理中断时会触发
     @available(iOS 9.0, *)
     public func webViewWebContentProcessDidTerminate(_ webView: WKWebView) {
         navigationDelegate?.webViewWebContentProcessDidTerminate?(webView)
-    }//10
-    
-    
-    
-    @available(iOS 10.0, *)
-    public func webView(_ webView: WKWebView, shouldPreviewElement elementInfo: WKPreviewElementInfo) -> Bool {
-        return true
     }
-    
-    public func webView(_ webView: WKWebView, commitPreviewingViewController previewingViewController: UIViewController) {
-
-    }
-    
 }

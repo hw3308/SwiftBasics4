@@ -69,8 +69,8 @@ public class LoadingButton: UIButton {
         if let label = self.titleLabel {
             height = label.frame.height - 4
             width = height
-            x = label.frame.origin.x - (width + padding)
-            y = label.frame.origin.y +  ((label.frame.height - height) / 2.0)
+            x = label.frame.x - (width + padding)
+            y = label.frame.y +  ((label.frame.height - height) / 2.0)
             return CGRect.init(x: x, y: y, width: width, height: height)
         }
         

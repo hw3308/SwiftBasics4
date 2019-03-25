@@ -14,8 +14,9 @@ extension WebView {
     
     open class UserContentController : WKUserContentController, WKScriptMessageHandler {
         
-        let name = "__AHA_JSSDK"
-        let methodKey = "__AHA__METHOD__NAME__"
+        let name = "__JSSDK__"
+
+        let methodKey = "__METHOD__NAME__"
         
         open var embedService: EmbedService!
         open weak var webView: WebView!

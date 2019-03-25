@@ -22,12 +22,12 @@ extension Date{
     }
     
     public static func dateAfterMinutes(Minutes:Int) -> Date{
-        let aTimeInterval:TimeInterval =  Date.timeIntervalSinceReferenceDate + Double(kMinute * Double(Minutes))
+        let aTimeInterval:TimeInterval =  Date.timeIntervalSinceReferenceDate + Double(kMinuteSeconds * Double(Minutes))
         return Date.init(timeIntervalSinceReferenceDate: aTimeInterval)
     }
     
     public static func dateBeforeMinutes(Minutes:Int) -> Date{
-        let aTimeInterval:TimeInterval =  Date.timeIntervalSinceReferenceDate + Double(kMinute * Double(Minutes) * -1)
+        let aTimeInterval:TimeInterval =  Date.timeIntervalSinceReferenceDate + Double(kMinuteSeconds * Double(Minutes) * -1)
         return Date.init(timeIntervalSinceReferenceDate: aTimeInterval)
     }
     

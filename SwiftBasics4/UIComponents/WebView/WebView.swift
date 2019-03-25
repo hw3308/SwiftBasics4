@@ -8,25 +8,18 @@
 
 import Foundation
 import WebKit
-import Reachability
-
 
 open class WebView: UIView {
     
-    // MARK:- statics
-    
+    // MARK:- statics 用户代理信息
     fileprivate static var _userAgent: String!
     
     public static var userAgent: String {
-        
         if _userAgent == nil {
             _userAgent = UIWebView().stringByEvaluatingJavaScript(from: "navigator.userAgent") ?? ""
         }
-
-        let ua = "Agent/\(String(describing: _userAgent)) Version/\(App.version) Language/\(App.language)"
-        
+        let ua = "Agent/\(_userAgent!) Version/\(App.version) Language/\(App.language)"
         UserDefaults.standard.register(defaults: ["UserAgent": ua])
-        
         return ua
     }
     
@@ -49,24 +42,23 @@ open class WebView: UIView {
         return config
     }
     
+    
+    // MARK: webView
+    open var webView: WKWebView!
+    
     // MARK: properties
     open var loadingProgressBar = UIProgressView()
+    
     open var loadingProgressBarHidden: Bool = false {
         didSet {
             loadingProgressBar.isHidden = loadingProgressBarHidden
         }
     }
     
-    
     // MARK: Delegate
     open weak var serviceDelegate: WebViewServiceDelegate?
     open weak var navigationDelegate: WKNavigationDelegate?
     open weak var UIDelegate: WKUIDelegate?
-    
-    open var webView: WKWebView!
-    
-    
-    
     
     // MARK: - init
 
@@ -88,54 +80,57 @@ open class WebView: UIView {
         self.setup(WebView.defaultConfiguration)
     }
     
+    open override func awakeFromNib() {
+        super.awakeFromNib()
+        self.setup(WebView.defaultConfiguration)
+    }
+    
     fileprivate func setup(_ config: WKWebViewConfiguration) {
+        
+        /// Setup Loading ProgressBar
+        
+        loadingProgressBar.autoresizingMask = [.flexibleWidth]
+        self.addSubview(loadingProgressBar)
+        loadingProgressBar.frame = CGRect.init(x: 0, y: 0, width: self.frame.width, height: 1.0)
+ 
         // Setup WebView
-        webView = WKWebView(frame: bounds, configuration: config)
+        let frame = CGRect.init(x: 0, y: 1.0, width: self.frame.width, height: self.frame.height-1.0)
+        webView = WKWebView(frame: frame, configuration: config)
         webView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
         self.addSubview(webView)
+        
+        if #available(iOS 11, *){
+            webView.scrollView.contentInsetAdjustmentBehavior =  .never
+        }
+
+        // Setup User Agent
+        if #available(iOS 9.0, *) {
+            webView.customUserAgent = WebView.userAgent
+        }
         
         // Setup User Content Controller
         if let userContentController = webView.configuration.userContentController as? UserContentController {
             userContentController.webView = self
         }
         
-        // Setup User Agent
-        if #available(iOS 9.0, *) {
-            webView.customUserAgent = WebView.userAgent
-        }
-        
-        // Setup Loading ProgressBar
-        self.addSubview(loadingProgressBar)
-        loadingProgressBar.frame = CGRect(x: 0, y: 0, width: self.bounds.size.width, height: 1)
-        loadingProgressBar.autoresizingMask = [.flexibleWidth]
-        
         // Setup Navigation Delegate
         webView.navigationDelegate = self
-        webView.addObserver(self, forKeyPath: "estimatedProgress", options: .new, context: nil)
         
         // Setup UI Delegate
         webView.uiDelegate = self
+        
+        webView.addObserver(self, forKeyPath: "estimatedProgress", options: .new, context: nil)
     }
     
     deinit {
         webView.removeObserver(self, forKeyPath: "estimatedProgress")
     }
     
-    // MARK: - Custom Methods
-    
-    func loadURLString(_ urlString: String) -> WKNavigation? {
-        if let url = Foundation.URL(string: urlString) {
-            return loadRequest(URLRequest(url: url))
-        }
-        return nil
-    }
     
     // MARK: - Observe Value For KeyPath
-    
     override open func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey:Any]?, context: UnsafeMutableRawPointer?) {
         if keyPath == "estimatedProgress" {
             self.loadingProgressBar.progress = Float(0.1 + self.webView.estimatedProgress * 0.9)
         }
     }
-    
 }

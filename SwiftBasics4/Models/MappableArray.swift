@@ -13,7 +13,7 @@ class MappableArray<T: Mappable> : Mappable {
     required init?(map: Map) {
         if let val = map.currentValue as? [String:Any] {
             for item in val {
-                let _map = Map(mappingType: ObjectMapper.MappingType.fromJSON, JSON: item)
+                let _map = Map(mappingType:.fromJSON, JSON: item)
                 var obj = T(map:_map)
                 obj?.mapping(map:_map)
                 value.append(obj!)
