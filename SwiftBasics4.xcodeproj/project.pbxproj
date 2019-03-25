@@ -59,7 +59,6 @@
 		CDAEAB762248726000F9485E /* Kingfisher+Settings.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDAEAB752248726000F9485E /* Kingfisher+Settings.swift */; };
 		CDBEE93F222786FF0098CA00 /* Alert.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDBEE93E222786FF0098CA00 /* Alert.swift */; };
 		CDE8D5E2208591F1007D9C22 /* SwiftBasics4.h in Headers */ = {isa = PBXBuildFile; fileRef = CDE8D5E0208591F1007D9C22 /* SwiftBasics4.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		CDE8D61C20859274007D9C22 /* ObjectMapper+Map.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDE8D5F020859273007D9C22 /* ObjectMapper+Map.swift */; };
 		CDE8D62020859274007D9C22 /* WebView+NavigationDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDE8D5F620859273007D9C22 /* WebView+NavigationDelegate.swift */; };
 		CDE8D62120859274007D9C22 /* WebView+Proxy.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDE8D5F720859273007D9C22 /* WebView+Proxy.swift */; };
 		CDE8D62220859274007D9C22 /* WebView+UIDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDE8D5F820859273007D9C22 /* WebView+UIDelegate.swift */; };
@@ -134,7 +133,6 @@
 		CDE8D5DD208591F1007D9C22 /* SwiftBasics4.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = SwiftBasics4.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		CDE8D5E0208591F1007D9C22 /* SwiftBasics4.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SwiftBasics4.h; sourceTree = "<group>"; };
 		CDE8D5E1208591F1007D9C22 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		CDE8D5F020859273007D9C22 /* ObjectMapper+Map.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "ObjectMapper+Map.swift"; sourceTree = "<group>"; };
 		CDE8D5F620859273007D9C22 /* WebView+NavigationDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "WebView+NavigationDelegate.swift"; sourceTree = "<group>"; };
 		CDE8D5F720859273007D9C22 /* WebView+Proxy.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "WebView+Proxy.swift"; sourceTree = "<group>"; };
 		CDE8D5F820859273007D9C22 /* WebView+UIDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "WebView+UIDelegate.swift"; sourceTree = "<group>"; };
@@ -413,7 +411,6 @@
 				CD60BC6B22436EFD00256B01 /* UIImage */,
 				CD60BC6622436EFD00256B01 /* UIView */,
 				CD60BC7722436EFD00256B01 /* ViewController */,
-				CDE8D5F020859273007D9C22 /* ObjectMapper+Map.swift */,
 			);
 			path = Category;
 			sourceTree = "<group>";
@@ -627,7 +624,6 @@
 				CD60BC9922437D5A00256B01 /* UIViewController+Storyboard.swift in Sources */,
 				CDE8D62420859274007D9C22 /* WebView+EmbedService.swift in Sources */,
 				CDE8D63120859274007D9C22 /* NetworkManager.swift in Sources */,
-				CDE8D61C20859274007D9C22 /* ObjectMapper+Map.swift in Sources */,
 				CD60BCAA2243836F00256B01 /* VerticalButton.swift in Sources */,
 				CDE8D62520859274007D9C22 /* WebView+UserContentController.swift in Sources */,
 				CD60BC7D22436EFD00256B01 /* CALayer+Shadow.swift in Sources */,
