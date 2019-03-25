@@ -9,13 +9,11 @@
 import Foundation
 
 
-let kMinute = 60.0
-let kHour = kMinute * 60
-let kDaySeconds = kHour * 24
-let kDayMinutes = kMinute * 24
-let kWeek = kDayMinutes * 7
-let kMonth = kDayMinutes * 31
-let kYear = kDayMinutes * 365
+let kMinuteSeconds = 60.0
+let kHourSeconds = kMinuteSeconds * 60
+let kDaySeconds = kHourSeconds * 24
+let kWeekSeconds = kDaySeconds * 7
+let kYearSeconds = kDaySeconds * 365
 
 
 // MARK: Format

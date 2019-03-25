@@ -11,7 +11,7 @@ class MappableArray<T: Mappable> : Mappable {
     var value: [T] = []
 
     required init?(map: Map) {
-        if let val = map.currentValue as? [[String:AnyObject]] {
+        if let val = map.currentValue as? [String:Any] {
             for item in val {
                 let _map = Map(mappingType: ObjectMapper.MappingType.fromJSON, JSON: item)
                 var obj = T(map:_map)

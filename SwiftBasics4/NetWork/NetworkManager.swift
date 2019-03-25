@@ -19,7 +19,7 @@ open class NetworkManager {
     
 
     //MARK: 初始化网络请求 默认JSON
-    public static func initNetworkManager(serverTrustPolicie serverTrustPolicies: [String: ServerTrustPolicy]? = nil) {
+    public static func initNetworkManager(serverTrustPolicie serverTrustPolicies: [String: ServerTrustPolicy]? = nil,additionalHeaders: (() -> [String : String]?)? = nil) {
         
         SwiftURLCache.activate()
         
@@ -30,12 +30,19 @@ open class NetworkManager {
         }
         
         defaultSessionConfiguration.timeoutIntervalForRequest = 10
-        defaultSessionConfiguration.httpAdditionalHeaders = Alamofire.SessionManager.defaultHTTPHeaders
         defaultSessionConfiguration.httpCookieStorage = sharedCookieStorage
         ///地址
         defaultSessionConfiguration.urlCache = URLCache.shared
         ///缓存策略
         defaultSessionConfiguration.requestCachePolicy = .returnCacheDataElseLoad
+        
+        var headers = SessionManager.defaultHTTPHeaders
+        if let _ = additionalHeaders,let newHeaders = additionalHeaders!(){
+            for (key,value) in newHeaders{
+                headers[key] = value
+            }
+        }
+        defaultSessionConfiguration.httpAdditionalHeaders = headers
         
         defaultManager = Alamofire.SessionManager(configuration: NetworkManager.defaultSessionConfiguration, serverTrustPolicyManager: serverTrustPolicyManager)
     }

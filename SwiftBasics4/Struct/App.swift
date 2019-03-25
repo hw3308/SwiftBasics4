@@ -11,7 +11,8 @@ import Foundation
 // 正则表达式：手机号
 let REGEXP_MOBILES = "^(1[3-9][0-9])\\d{8}$"
 //验证码 正则表达式
-let REGEXT_VERCODE = "^\\d{4}$"
+let REGEXT_VERCODE_4 = "^\\d{4}$"
+let REGEXT_VERCODE_6 = "^\\d{6}$"
 //邮箱正则
 let REGEXP_EMAIL : String = "\\w+([-+.]\\w+)*@\\w+([-.]\\w+)*\\.\\w+([-.]\\w+)*"
 //URL 正则

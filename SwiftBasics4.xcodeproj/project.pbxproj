@@ -56,6 +56,7 @@
 		CD60BCB522438D5B00256B01 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CD60BCB422438D5B00256B01 /* Foundation.framework */; };
 		CD60BCB7224393AC00256B01 /* LoadingButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD60BCB6224393AC00256B01 /* LoadingButton.swift */; };
 		CD60BCBA2243950000256B01 /* RefreshTableView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD60BCB92243950000256B01 /* RefreshTableView.swift */; };
+		CDAEAB762248726000F9485E /* Kingfisher+Settings.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDAEAB752248726000F9485E /* Kingfisher+Settings.swift */; };
 		CDBEE93F222786FF0098CA00 /* Alert.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDBEE93E222786FF0098CA00 /* Alert.swift */; };
 		CDE8D5E2208591F1007D9C22 /* SwiftBasics4.h in Headers */ = {isa = PBXBuildFile; fileRef = CDE8D5E0208591F1007D9C22 /* SwiftBasics4.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		CDE8D61C20859274007D9C22 /* ObjectMapper+Map.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDE8D5F020859273007D9C22 /* ObjectMapper+Map.swift */; };
@@ -128,6 +129,7 @@
 		CD60BCB422438D5B00256B01 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		CD60BCB6224393AC00256B01 /* LoadingButton.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LoadingButton.swift; sourceTree = "<group>"; };
 		CD60BCB92243950000256B01 /* RefreshTableView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RefreshTableView.swift; sourceTree = "<group>"; };
+		CDAEAB752248726000F9485E /* Kingfisher+Settings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Kingfisher+Settings.swift"; sourceTree = "<group>"; };
 		CDBEE93E222786FF0098CA00 /* Alert.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Alert.swift; sourceTree = "<group>"; };
 		CDE8D5DD208591F1007D9C22 /* SwiftBasics4.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = SwiftBasics4.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		CDE8D5E0208591F1007D9C22 /* SwiftBasics4.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SwiftBasics4.h; sourceTree = "<group>"; };
@@ -354,6 +356,14 @@
 			path = UITableView;
 			sourceTree = "<group>";
 		};
+		CDAEAB742248723A00F9485E /* Kingfisher */ = {
+			isa = PBXGroup;
+			children = (
+				CDAEAB752248726000F9485E /* Kingfisher+Settings.swift */,
+			);
+			path = Kingfisher;
+			sourceTree = "<group>";
+		};
 		CDE8D5D3208591F1007D9C22 = {
 			isa = PBXGroup;
 			children = (
@@ -376,6 +386,7 @@
 		CDE8D5DF208591F1007D9C22 /* SwiftBasics4 */ = {
 			isa = PBXGroup;
 			children = (
+				CDAEAB742248723A00F9485E /* Kingfisher */,
 				CD0ED4C62244E5CB001A7E63 /* Models */,
 				CDE8D60220859273007D9C22 /* Cache */,
 				CDE8D60C20859274007D9C22 /* Struct */,
@@ -635,6 +646,7 @@
 				CD60BC8822436EFD00256B01 /* Realm+Cache.swift in Sources */,
 				CD0ED4C32244B0F7001A7E63 /* ApiSettings.swift in Sources */,
 				CDBEE93F222786FF0098CA00 /* Alert.swift in Sources */,
+				CDAEAB762248726000F9485E /* Kingfisher+Settings.swift in Sources */,
 				CD60BC9522437C5300256B01 /* String+Digit.swift in Sources */,
 				CD60BC8722436EFD00256B01 /* UIViewController+Top.swift in Sources */,
 				CD60BC9D22437E2000256B01 /* UIViewController+NavigationBar.swift in Sources */,

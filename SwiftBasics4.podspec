@@ -60,7 +60,6 @@ s.dependency 'RealmSwift'
 s.dependency 'Realm'
 s.dependency 'Alamofire'
 s.dependency 'AlamofireObjectMapper'
-s.dependency 'Kingfisher'
 s.dependency 'ReachabilitySwift'
-
+s.dependency 'Kingfisher'
 end

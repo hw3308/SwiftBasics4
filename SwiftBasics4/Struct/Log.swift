@@ -52,7 +52,7 @@ public struct Log {
         }
         print("\(time) \(threadDesc)[\(level)] \(message) in \(function) \(filename):\(line):\(column)")
     }
-    
+    //@autoclosure 将表达式自动封闭成一个闭包 只适用于无参比表
     public static func debug<T>(_ message: @autoclosure () -> T, column: Int = #column, line: Int = #line, function: String = #function, file: String = #file) {
         guard level & LEVEL_DEBUG != 0 else { return }
         printMessage("DEBUG", message: message(), column: column, line: line, function: function, file: file)
