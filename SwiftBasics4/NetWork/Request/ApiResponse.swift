@@ -23,7 +23,7 @@ class ApiResponse<T: Mappable>:Mappable {
     ///返回的模型数据
     var data: T?
     /// 状态码
-    var code:Int = 0
+    var code:Int = -1
     /// 错误信息
     var message: String?
     /// 当前服务端时间戳
@@ -31,6 +31,14 @@ class ApiResponse<T: Mappable>:Mappable {
     
     //请求是否成功
     var isOK: Bool{
+        for (error,errorCode) in ApiError.errorCodes {
+            switch error{
+            case .apiError(_):
+                return code == errorCode
+            default:
+                break
+            }
+        }
         return code == 0
     }
 	
@@ -72,13 +80,29 @@ class ApiResponse<T: Mappable>:Mappable {
 	
 	func failure(_ callback: (_ error: ApiError) -> Void) -> ApiResponse {
         
-		guard !isOK else { return self }
-        
-		if let error = self.error {
-			callback(error)
-		} else if data == nil {
-			callback(ApiError.dataError)
-		}
+		guard !isOK else {
+            if data == nil{
+                callback(ApiError.dataError)
+            }
+            return self
+        }
+        for (error,errorCode) in ApiError.errorCodes {
+            switch error{
+            case .apiError(_):
+                if code == errorCode{
+                    callback(ApiError.apiError(message: message ?? ""))
+                }
+                return self;
+            case .authorFilad:
+                if code == errorCode{
+                    callback(ApiError.authorFilad)
+                }
+                return self;
+            default:
+                break
+            }
+        }
+        callback(ApiError.httpError(status: code))
         return self
 	}
 	
@@ -91,8 +115,10 @@ class ApiResponse<T: Mappable>:Mappable {
                 }else{
                     Toast.toast("请求失败")
                 }
-            case .dataError, .httpError(_):
+            case .httpError(_):
                 Toast.toast("网络不给力")
+            case .dataError:
+                Toast.toast("数据错误")
             case .authorFilad:
                 Toast.toast("请先登录")
             }

@@ -129,26 +129,22 @@ import AlamofireObjectMapper
                 }
                 Log.info(value.rawString)
             } else {
-                Log.error(value.errorMsg)
+                Log.error(value.message)
             }
             Queue.async {
                 callback(value)
             }
             
         case .failure(_):
-            
             let value = ApiResponse<T>()
-            value.isOK = false
-            
             if let statusCode = response.response?.statusCode {
+                value.code = statusCode
                 if statusCode >= 200 && statusCode < 400 {
-                    value.error = ApiError.httpRequestError(status: (response.response?.statusCode)!)
-                    Queue.async {
-                        callback(value)
-                    }
+                    value.error = ApiError.httpError(status: (response.response?.statusCode)!)
                     return
                 }
             }
+            value.code = -1
             value.error = ApiError.dataError
             Queue.async {
                 callback(value)
@@ -304,7 +300,7 @@ extension ApiRequest{
                 })
             case .failure(_):
                 let value = ApiResponse<T>()
-                value.isOK = false
+                value.code = -1
                 value.error = ApiError.dataError
                 Queue.async {
                     callback(value)
