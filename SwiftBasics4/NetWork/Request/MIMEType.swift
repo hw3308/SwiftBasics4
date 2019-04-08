@@ -9,6 +9,7 @@
 import Foundation
 
 public enum MIMEType: String {
+    
     case json = "application/json"
     case html = "text/xml"
     case xml = "text/html"

@@ -20,18 +20,29 @@ extension CGRect {
     }
     
     public var x:CGFloat{
-        return origin.x
+        set{ self.origin.x = newValue }
+        
+        get{ return origin.x }
     }
     
     public var y:CGFloat{
-        return origin.y
+        
+        set{ self.origin.y = newValue }
+        
+        get{ return origin.y}
     }
     
     public var width:CGFloat{
-        return size.width
+        
+        set{ self.size.width = newValue}
+        
+        get{ return size.width }
     }
     
     public var height:CGFloat{
-        return size.height
+        
+        set{ self.size.height = newValue}
+        
+        get{ return size.height}
     }
 }

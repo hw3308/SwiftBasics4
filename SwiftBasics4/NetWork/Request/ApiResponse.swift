@@ -19,17 +19,24 @@ class ApiResponse<T: Mappable>:Mappable {
     var rawString: String! {
         return String(data: rawData, encoding: String.Encoding.utf8)
     }
+    
+    ///返回的模型数据
+    var data: T?
+    /// 状态码
+    var code:Int = 0
+    /// 错误信息
+    var message: String?
+    /// 当前服务端时间戳
+    var timestamp:TimeInterval?
+    
     //请求是否成功
-	var isOK: Bool = false
+    var isOK: Bool{
+        return code == 0
+    }
 	
-    //返回的模型数据
-	var data: T?
-    
-    var errorMsg: String?
-    
     //错误
 	var error: ApiError?
-	
+    
 	init() {
 
 	}
@@ -40,29 +47,33 @@ class ApiResponse<T: Mappable>:Mappable {
 	
 	func mapping(map: Map) {
         
-		isOK <- map["success"]
+        code <- map["code"]
         
-        errorMsg <- map["message"]
+        message <- map["message"]
         
 		if isOK {
-            data <- map["Result"]
 			let value = map.currentValue
+            
             if value is String || value is Bool || value is Int || value is Array<Any> {
                 data = T(map:map)
+            }else{
+                data <- map["data"]
             }
 		} else {
-			error = ApiError.apiError(message: errorMsg ?? "")
+			error = ApiError.apiError(message: message ?? "")
 		}
 	}
     
 	func success(_ callback: (_ data: T?) -> Void) -> ApiResponse {
-		guard isOK else {return self}
+		guard isOK else { return self }
 		callback(data)
         return self
 	}
 	
 	func failure(_ callback: (_ error: ApiError) -> Void) -> ApiResponse {
-		guard !isOK else {return self}
+        
+		guard !isOK else { return self }
+        
 		if let error = self.error {
 			callback(error)
 		} else if data == nil {
@@ -80,8 +91,10 @@ class ApiResponse<T: Mappable>:Mappable {
                 }else{
                     Toast.toast("请求失败")
                 }
-            case .dataError, .httpRequestError(_):
+            case .dataError, .httpError(_):
                 Toast.toast("网络不给力")
+            case .authorFilad:
+                Toast.toast("请先登录")
             }
         }
 		return res

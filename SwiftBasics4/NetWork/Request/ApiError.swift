@@ -8,11 +8,14 @@
 
 import Foundation
 
+//MAKR: 接口请求错误
 enum ApiError: Error {
     
-	case httpRequestError(status: Int)
+	case httpError(status: Int) ///网络请求失败
     
-	case apiError(message: String)
+	case apiError(message: String) ///服务端返回失败
     
-	case dataError
+	case dataError  ///数据错误
+    
+    case authorFilad  ///用户认证失败
 }
