@@ -8,14 +8,18 @@
 
 import Foundation
 import UIKit
-// MARK: NavigationBar
 
+
+// MARK: NavigationBar
 extension UIViewController {
     
     fileprivate struct AssociatedKey {
         static var navigationBarAlpha: CGFloat = 0
+        
+        static var navigationBarShadowHidden: Bool = false
     }
     
+    /// 导航栏透明度
     var navigationBarAlpha: CGFloat {
         get { return objc_getAssociatedObject(self, &AssociatedKey.navigationBarAlpha) as? CGFloat ?? 1 }
         set { self.setNavigationBarAlpha(newValue, animated: false) }
@@ -52,5 +56,35 @@ extension UIViewController {
     /// 显示/隐藏 NavigationBar
     public func setNavigationBarHidden(_ hidden: Bool, animated: Bool) {
         self.navigationController?.setNavigationBarHidden(hidden, animated: animated)
+    }
+    
+    
+    /// 导航栏透阴影线是否显示
+    var navigationBaShadowHidden: Bool {
+        get { return objc_getAssociatedObject(self, &AssociatedKey.navigationBarShadowHidden) as? Bool ?? false }
+        set { self.setNavigationBarShadow(newValue) }
+    }
+    
+    /// 设置导航栏阴影线显示
+    func setNavigationBarShadow(_ hidden: Bool) {
+        objc_setAssociatedObject(self, &AssociatedKey.navigationBarShadowHidden
+            , hidden, .OBJC_ASSOCIATION_RETAIN)
+        self.updateNavigationBarShadow(hidden)
+    }
+    
+    /// 更新导航栏阴影线显示
+    func updateNavigationBarShadow(_ hidden:Bool) {
+        
+        var navigationBar:UINavigationBar?
+        
+        if self is UINavigationController{
+            let nav = self as! UINavigationController
+            navigationBar = nav.navigationBar
+        }else if let nav = self.navigationController{
+            navigationBar = nav.navigationBar
+        }
+        
+        navigationBar?.shadowImage = hidden ? UIImage() : nil
+        navigationBar?.setBackgroundImage(hidden ? UIImage() : nil, for: .default)
     }
 }
